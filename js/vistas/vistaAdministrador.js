@@ -61,7 +61,12 @@ VistaAdministrador.prototype = {
       var respuestas = [];
 
       $('[name="option[]"]').each(function() {
-        respuestas.push(value)
+        const textoRespuesta = $(this).val();
+        if(textoRespuesta !== ""){
+        respuestas.push({
+          textoRespuesta: textoRespuesta
+        })
+      }
       })
       contexto.limpiarFormulario();
       contexto.controlador.agregarPregunta(value, respuestas);
