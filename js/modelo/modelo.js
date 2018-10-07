@@ -7,6 +7,7 @@ var Modelo = function() {
 
   //inicializacion de eventos
   this.preguntaAgregada = new Evento(this);
+  this.preguntaEliminada = new Evento(this);
 };
 
 Modelo.prototype = {
@@ -32,6 +33,17 @@ Modelo.prototype = {
     this.preguntaAgregada.notificar();
 
   },
+
+  eliminarPregunta: function(id) {
+    const newArr = this.preguntas.filter(function(pregunta){
+      return pregunta.id !==  id
+    })
+    this.preguntas = newArr;
+    this.guardar();
+    this.preguntaEliminada.notificar();
+  },
+
+
 
   //se guardan las preguntas
   guardar: function(){
