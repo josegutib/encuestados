@@ -43,6 +43,17 @@ Modelo.prototype = {
     this.preguntaEliminada.notificar();
   },
 
+  getPreguntaById: function(id){
+    const pregunta = this.preguntas.filter(function(pregunta){
+      return pregunta.id === id
+    })
+    return pregunta[0]
+  },
+
+  agregarRespuesta: function(id,respuesta){
+    const pregunta = getPreguntaById(id);
+    pregunta.cantidadPorRespuesta.push(respuesta); // TODO: Notificar Evento
+  },
 
 
   //se guardan las preguntas
