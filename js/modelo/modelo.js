@@ -9,6 +9,8 @@ var Modelo = function() {
   this.preguntaAgregada = new Evento(this);
   this.preguntaEliminada = new Evento(this);
   this.respuestaAgregada = new Evento(this);
+  this.preguntaEditada = new Evento(this);
+  this.votoSumado = new Evento(this);
 };
 
 Modelo.prototype = {
@@ -63,11 +65,13 @@ Modelo.prototype = {
     pregunta.textoPregunta = nuevaPregunta;
     pregunta.cantidadPorRespuesta = nuevasRespuestas;
     this.guardar();
+    this.preguntaEditada.notificar();
   },
 
   sumarUnVoto: function(id){
     const pregunta = getPreguntaById(id);
     pregunta.votos+=1
+    this.votoSumado.notificar();
     this.guardar();
   },
 
