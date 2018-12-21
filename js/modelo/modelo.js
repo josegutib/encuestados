@@ -2,7 +2,7 @@
  * Modelo
  */
 var Modelo = function() {
-  this.preguntas = this.cargar();
+  this.estado = this.cargar();
   this.ultimoId = 0;
 
   //inicializacion de eventos
@@ -10,17 +10,18 @@ var Modelo = function() {
   this.preguntaEliminada = new Evento(this);
   this.respuestaAgregada = new Evento(this);
   this.preguntaEditada = new Evento(this);
-  this.votoSumado = new Evento(this);
+  this.votoAgregado = new Evento(this);
+  this.preguntaEditModificada = new Evento(this);
 };
 
 Modelo.prototype = {
   //se obtiene el id más grande asignado a una pregunta
   obtenerUltimoId: function() {
     let ultimoId = 0;
-    let self = this;
-    for(i=0; i<self.preguntas.length; i++){
-      if(self.preguntas[i].id>ultimoId){
-        ultimoId=self.preguntas[i].id;
+    const preguntas = this.estado.preguntas
+    for(i=0; i<preguntas.length; i++){
+      if(preguntas[i].id>ultimoId){
+        ultimoId=preguntas[i].id;
       }
     }
     return ultimoId;
@@ -30,69 +31,90 @@ Modelo.prototype = {
   agregarPregunta: function(nombre, respuestas) {
     var id = this.obtenerUltimoId();
     id++;
-    var nuevaPregunta = {'textoPregunta': nombre, 'id': id, 'cantidadPorRespuesta': respuestas, 'votos':0};
-    this.preguntas.push(nuevaPregunta);
+    var nuevaPregunta = {'textoPregunta': nombre, 'id': id, 'cantidadPorRespuesta': respuestas};
+    this.estado.preguntas.push(nuevaPregunta);
     this.guardar();
     this.preguntaAgregada.notificar();
 
   },
 
   eliminarPregunta: function(id) {
-    const newArr = this.preguntas.filter(function(pregunta){
+    const newArr = this.estado.preguntas.filter(function(pregunta){
       return pregunta.id !==  id
     })
-    this.preguntas = newArr;
+    this.estado.preguntas = newArr;
     this.guardar();
     this.preguntaEliminada.notificar();
   },
 
   getPreguntaById: function(id){
-    const pregunta = this.preguntas.filter(function(pregunta){
+    const pregunta = this.estado.preguntas.filter(function(pregunta){
       return pregunta.id === id
     })
     return pregunta[0]
   },
 
   agregarRespuesta: function(id,respuesta){
-    const pregunta = getPreguntaById(id);
+    const pregunta = this.getPreguntaById(id);
     pregunta.cantidadPorRespuesta.push(respuesta); // TODO: Notificar Evento
     this.guardar();
     this.respuestaAgregada.notificar();
   },
 
   editarPregunta: function(id, nuevaPregunta, nuevasRespuestas){
-    const pregunta = getPreguntaById(id);
+    const pregunta = this.getPreguntaById(id);
     pregunta.textoPregunta = nuevaPregunta;
     pregunta.cantidadPorRespuesta = nuevasRespuestas;
     this.guardar();
     this.preguntaEditada.notificar();
   },
 
-  sumarUnVoto: function(id){
-    const pregunta = getPreguntaById(id);
-    pregunta.votos+=1
-    this.votoSumado.notificar();
+  agregarVoto: function(id, textoRespuesta){
+    const pregunta = this.getPreguntaById(id);
+    const respuestaAVotar = pregunta.cantidadPorRespuesta.filter(function(respuesta){
+      return respuesta.textoRespuesta === textoRespuesta
+    })[0]
+    respuestaAVotar.votos+=1
+    this.votoAgregado.notificar();
     this.guardar();
   },
 
   eliminarTodasLasPreguntas : function(){
-    this.preguntas = []
+    this.estado.preguntas = []
     this.guardar();
     this.preguntaEliminada.notificar();
   },
 
+  getPreguntas: function(){
+    return this.estado.preguntas
+  },
+
+  getPreguntaEdit: function(){
+    const preguntaEdit = this.estado.preguntaEdit;
+    return {...preguntaEdit}
+  },
+
+  setPreguntaEdit: function(pregunta){
+    this.estado.preguntaEdit = {...pregunta};
+    this.guardar();
+    this.preguntaEditModificada.notificar();
+  },
+
   cargar: function() {
-    const preguntas = localStorage.getItem('preguntas')
-    if(!preguntas){
-      return []
+    const estado = localStorage.getItem('estado')
+    if(!estado){
+      return {
+        preguntas: [],
+        preguntaEdit: {}
+      }
     }else{
-      return JSON.parse(preguntas)
+      return JSON.parse(estado)
     }
 
   },
 
   //se guardan las preguntas
   guardar: function(){
-    localStorage.setItem('preguntas' , JSON.stringify(this.preguntas))
+    localStorage.setItem('estado' , JSON.stringify(this.estado))
   },
 };
