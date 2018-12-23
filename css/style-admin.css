@@ -126,6 +126,32 @@ ul.list-group li small {
 	max-width: 42%;
 }
 
+#header{
+	padding-top:20%;
+}
+
+#header button{
+	margin-bottom: 20px;
+	font-size: 1em;
+}
+
+#content input{
+	margin-top:2px;
+	border-style: none;
+	border-radius: 25px;
+	font-size: 1em;
+}
+
+#editarPreguntaModal button{
+	border-radius: 25px;
+	border-style: none;
+}
+
+.twoBtns{
+	margin-top: 20px;
+}
+
+
 .modal{
 	display:none;
 	position:fixed;
@@ -133,8 +159,9 @@ ul.list-group li small {
 	left:50%;
 	width: 500px;
 	height: 400px;
-	background-color: red;
+	background-color: #1DB8C3;
 	transform:translate(-50%,-50%);
+	border-radius: 25px;
 }
 /*////////// RESPONSIVE ////////////*/
 
