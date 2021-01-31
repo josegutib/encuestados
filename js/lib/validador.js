@@ -29,6 +29,7 @@ $('#localStorageForm')
     }
   })
   .on('click', '.botonAgregarRespuesta', function() {
+    console.log("agregar respuesta");
     var $template = $('#optionTemplate'),
       $clone = $template
       .clone()

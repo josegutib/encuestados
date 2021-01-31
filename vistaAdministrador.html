@@ -24,7 +24,7 @@
       <h2>Agrega y administra preguntas y sus respuestas</h2>
 
       <form id="localStorageForm" method="post" class="form-horizontal">
-        
+
         <div class="form-box">
 
           <div class="form-group">
@@ -73,6 +73,24 @@
         </div>
 
     </div>
+
+    <div id="editarPreguntaModal" class="modal">
+      <div id ="header">
+        <button id="closeModal">Close</button>
+      </div>
+
+      <div id="content">
+        <input type="text" id="preguntaEdit">
+        <div id="respuestasEdit">
+
+        </div>
+        <div class="twoBtns">
+          <button id="agregarRespuestaEdit">Agregar Respuesta</button>
+          <button id="actualizarPreguntaEdit">Actualizar Pregunta</button>
+        </div>
+      </div>
+    </div>
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

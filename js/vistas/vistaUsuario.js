@@ -11,6 +11,11 @@ var VistaUsuario = function(modelo, controlador, elementos) {
   this.modelo.preguntaAgregada.suscribir(function() {
     contexto.reconstruirLista();
   });
+
+  //suscripción al evento agregarVoto
+  this.modelo.votoAgregado.suscribir(function() {
+    contexto.reconstruirGrafico();
+  })
 };
 
 VistaUsuario.prototype = {
@@ -19,11 +24,11 @@ VistaUsuario.prototype = {
     this.reconstruirLista();
     var elementos = this.elementos;
     var contexto = this;
-    
+
     elementos.botonAgregar.click(function() {
-      contexto.agregarVotos(); 
+      contexto.agregarVotos();
     });
-      
+
     this.reconstruirGrafico();
   },
 
@@ -31,12 +36,21 @@ VistaUsuario.prototype = {
   reconstruirGrafico: function(){
     var contexto = this;
     //obtiene las preguntas del local storage
-    var preguntas = this.modelo.preguntas;
+    var preguntas = this.controlador.getPreguntas().filter(function(pregunta){
+      const sumaVotos = pregunta.cantidadPorRespuesta.map(function(respuesta){
+        return respuesta.votos
+      })
+      .reduce(function(acumulador,voto){
+        return acumulador + voto
+      },0)
+      return sumaVotos>0
+    })
+
     preguntas.forEach(function(clave){
       var listaParaGrafico = [[clave.textoPregunta, 'Cantidad']];
       var respuestas = clave.cantidadPorRespuesta;
       respuestas.forEach (function(elemento) {
-        listaParaGrafico.push([elemento.textoRespuesta,elemento.cantidad]);
+        listaParaGrafico.push([elemento.textoRespuesta,elemento.votos]);
       });
       contexto.dibujarGrafico(clave.textoPregunta, listaParaGrafico);
     })
@@ -47,12 +61,18 @@ VistaUsuario.prototype = {
     var listaPreguntas = this.elementos.listaPreguntas;
     listaPreguntas.html('');
     var contexto = this;
-    var preguntas = this.modelo.preguntas;
+    var preguntas = this.controlador.getPreguntas();
     preguntas.forEach(function(clave){
       //completar
       //agregar a listaPreguntas un elemento div con valor "clave.textoPregunta", texto "clave.textoPregunta", id "clave.id"
-      var respuestas = clave.cantidadPorRespuesta;
-      contexto.mostrarRespuestas(listaPreguntas,respuestas, clave);
+    const nuevoItem = $('<div>', {
+    'value' : clave.textoPregunta,
+    'text' : clave.textoPregunta,
+    'id' : clave.id
+  });
+    listaPreguntas.append(nuevoItem)
+    var respuestas = clave.cantidadPorRespuesta;
+    contexto.mostrarRespuestas(listaPreguntas,respuestas, clave);
     })
   },
 
@@ -78,7 +98,10 @@ VistaUsuario.prototype = {
         var id = $(this).attr('id');
         var respuestaSeleccionada = $('input[name=' + id + ']:checked').val();
         $('input[name=' + id + ']').prop('checked',false);
-        contexto.controlador.agregarVoto(nombrePregunta,respuestaSeleccionada);
+        if(respuestaSeleccionada!==undefined) {
+          contexto.controlador.agregarVoto(parseInt(id),respuestaSeleccionada);
+        }
+
       });
   },
 
